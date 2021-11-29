@@ -1,11 +1,38 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const multer = require('multer')
 
 //*importing User class and Joi validate method from userValidate.js file
 
 const Recipe = require('../models/RecipeSchema')
 
 const router = express.Router()
+
+const stroage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true)
+  } else {
+    cb(null, false) //i can throw any error message here, if the file type is unknown
+    //insted of null i can pass new Error('error mesage')
+  }
+}
+
+const upload = multer({
+  storage: stroage,
+  limits: {
+    fileSize: 1024 * 1024 * 5
+  },
+  fileFilter: fileFilter
+})
 
 router.get('/', async (req, res) => {
   try {
@@ -15,27 +42,43 @@ router.get('/', async (req, res) => {
     res.status(400).send('something went wrong while retriving data data')
   }
 })
-
-router.post('/', async (req, res) => {
+router.get('/:name', async (req, res) => {
   try {
+    console.log(req.params.name)
+
+    const dishes = await Recipe.find({ label: req.params.name })
+
+    res.send(dishes)
+  } catch (err) {
+    res.status(404).send('data not found')
+  }
+})
+
+router.post('/', upload.single('recipeImage'), async (req, res) => {
+  try {
+    console.log(req.file)
+    console.log(req.body)
+
+    //have to call the route through react form,so we can access all data
     let recipe = new Recipe({
       label: req.body.label,
       source: req.body.source,
-      url: req.body.url,
+      url: req.file.path,
       dietLabels: req.body.dietLabels,
       healthLabels: req.body.healthLabels,
-      cautions: req.body.cautions,
+
       ingredients: req.body.ingredients,
       makingDescription: req.body.makingDescription,
       cuisineType: req.body.cuisineType,
-      mealType: req.body.cuisineType,
-      dishType: req.body.dishType
+      mealType: req.body.mealType
     })
 
     recipe = await recipe.save()
 
-    res.send(recipe)
+    res.send('route called')
   } catch (err) {
+    console.log(err)
+
     res.status(400).send('something went wrong while saving the file')
   }
 })

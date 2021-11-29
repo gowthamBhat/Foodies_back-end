@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 const User = require('../models/UserSchema')
 
-// const router = express.Router();
+const router = express.Router()
 
 //Joi validate method
 // function validate(data) {
