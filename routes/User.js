@@ -46,13 +46,15 @@ router.post('/', async (req, res) => {
 
     // user.password = await bcrypt.hash(user.password, salt)
 
-    await user.save()
+    user = await user.save()
+    console.log(user)
+
     //*  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey')); this code also can be written but we are genrating through a method from uservalidate.js
-    // const token = user.generateAuthToken() //? values are genrated from uservalidare.js file
+    const token = user.generateAuthToken() //? values are genrated from uservalidare.js file
 
     res
-      //   .header('x-auth-token', token)
-      //   .header('access-control-expose-headers', 'x-auth-token') //* Setting this header is extreamly important to access jwt token in client side
+      .header('x-auth-token', token)
+      .header('access-control-expose-headers', 'x-auth-token') //* Setting this header is extreamly important to access jwt token in client side
       .send({ _id: user._id, name: user.name, email: user.email })
 
     //TODO    to remove returning password to user we can use the approach
