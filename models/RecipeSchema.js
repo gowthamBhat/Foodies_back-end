@@ -11,22 +11,15 @@ const recipeSchema = new mongoose.Schema(
       type: String
     },
     url: String,
-    dietLabels: [String],
-    healthLabels: [String],
-    cautions: [String],
-    ingredients: [
-      {
-        text: String,
-        weight: String //TODO:field value to be changed->quantity:string
-      }
-    ],
+    dietLabels: [],
+    healthLabels: [],
+    ingredients: [],
 
     makingDescription: {
       type: String
     },
     cuisineType: [String],
-    mealType: [String],
-    dishType: [String]
+    mealType: [String]
   },
   { timestamps: true }
 )
