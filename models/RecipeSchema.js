@@ -2,6 +2,15 @@ const mongoose = require('mongoose')
 
 const recipeSchema = new mongoose.Schema(
   {
+    authorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true
+    },
+    authorUsername: {
+      type: String,
+      required: true,
+      trim: true
+    },
     label: {
       type: String,
       required: true,

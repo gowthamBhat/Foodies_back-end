@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const adminSchema = new mongoose.Schema(
   {
@@ -28,8 +28,8 @@ const adminSchema = new mongoose.Schema(
     }
   },
   { timestamps: true }
-);
+)
 
-const Admin = mongoose.model('User', adminSchema);
+const Admin = mongoose.model('User', adminSchema)
 
-module.exports = Admin;
+module.exports = Admin

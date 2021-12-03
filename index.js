@@ -8,9 +8,10 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 
 //custom routes
-const userLoginRoute = require('./routes/User')
+const userSignUpRoute = require('./routes/User')
 const recipeRoutes = require('./routes/Recipe')
-const authRoutes = require('./routes/Auth')
+const userLogInRoute = require('./routes/Auth')
+const userSpecificRecipes = require('./routes/UserRecipes')
 
 process.on('uncaughtException', (e) => {
   console.log('WE GOT AN UNCAUGHT EXCEPTION')
@@ -41,9 +42,10 @@ app.use(function timeLogger(req, res, next) {
 app.use('/uploads', express.static('uploads'))
 
 //custom routes
-app.use('/login', userLoginRoute)
+app.use('/signup', userSignUpRoute)
 app.use('/recipe', recipeRoutes)
-app.use('/auth', authRoutes)
+app.use('/login', userLogInRoute)
+app.use('/userRecipes', userSpecificRecipes)
 
 //TODO: need to separate this Database  module
 

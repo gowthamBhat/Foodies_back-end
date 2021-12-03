@@ -60,11 +60,12 @@ router.get('/:name', async (req, res) => {
 
 router.post('/', upload.single('recipeImage'), async (req, res) => {
   try {
-    console.log(req.body.dietlabels)
-    console.log(typeof req.body.dietlabels)
+    console.log(req.body)
 
     //have to call the route through react form,so we can access all data
     let recipe = new Recipe({
+      authorId: req.body.authorId,
+      authorUsername: req.body.authorUsername,
       label: req.body.label,
       source: req.body.source,
       url: req.file.path,
