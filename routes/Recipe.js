@@ -46,14 +46,18 @@ router.get('/', async (req, res) => {
     res.status(400).send('something went wrong while retriving data data')
   }
 })
-router.get('/:name', async (req, res) => {
+router.get('/:userid', async (req, res) => {
   try {
-    // console.log(req.params.name)
+    console.log(req.params.userid)
 
-    const dishes = await Recipe.find({ label: req.params.name })
+    const dishes = await Recipe.find({ authorId: req.params.userid }).sort(
+      'label'
+    )
 
     res.send(dishes)
   } catch (err) {
+    console.log(err)
+
     res.status(404).send('data not found')
   }
 })
@@ -84,6 +88,15 @@ router.post('/', upload.single('recipeImage'), async (req, res) => {
     console.log(err)
 
     res.status(400).send('something went wrong while saving the file')
+  }
+})
+router.delete('/:id', async (req, res) => {
+  try {
+    const gen = await Recipe.findByIdAndRemove(req.params.id)
+
+    res.send(gen)
+  } catch (error) {
+    res.status(404).send('data not found')
   }
 })
 

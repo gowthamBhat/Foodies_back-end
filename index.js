@@ -11,7 +11,7 @@ require('dotenv').config()
 const userSignUpRoute = require('./routes/User')
 const recipeRoutes = require('./routes/Recipe')
 const userLogInRoute = require('./routes/Auth')
-const userSpecificRecipes = require('./routes/UserRecipes')
+const recipeSearchRoute = require('./routes/SearchRecipes')
 
 process.on('uncaughtException', (e) => {
   console.log('WE GOT AN UNCAUGHT EXCEPTION')
@@ -45,7 +45,7 @@ app.use('/uploads', express.static('uploads'))
 app.use('/signup', userSignUpRoute)
 app.use('/recipe', recipeRoutes)
 app.use('/login', userLogInRoute)
-app.use('/userRecipes', userSpecificRecipes)
+app.use('/search', recipeSearchRoute)
 
 //TODO: need to separate this Database  module
 
