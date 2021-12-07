@@ -46,6 +46,7 @@ router.get('/', async (req, res) => {
     res.status(400).send('something went wrong while retriving data data')
   }
 })
+//for userdashboard specific author recipe display
 router.get('/:userid', async (req, res) => {
   try {
     console.log(req.params.userid)
@@ -53,6 +54,19 @@ router.get('/:userid', async (req, res) => {
     const dishes = await Recipe.find({ authorId: req.params.userid }).sort(
       'label'
     )
+
+    res.send(dishes)
+  } catch (err) {
+    console.log(err)
+
+    res.status(404).send('data not found')
+  }
+})
+router.get('/byId/:id', async (req, res) => {
+  try {
+    console.log(req.params.id)
+
+    const dishes = await Recipe.find({ _id: req.params.id }).sort('label')
 
     res.send(dishes)
   } catch (err) {
@@ -88,6 +102,35 @@ router.post('/', upload.single('recipeImage'), async (req, res) => {
     console.log(err)
 
     res.status(400).send('something went wrong while saving the file')
+  }
+})
+
+//*PUT
+router.put('/:id', upload.single('recipeImage'), async (req, res) => {
+  try {
+    const recipe = await Recipe.findByIdAndUpdate(
+      req.params.id,
+      {
+        authorId: req.body.authorId,
+        authorUsername: req.body.authorUsername,
+        label: req.body.label,
+        source: req.body.source,
+        url: req.file.path,
+        dietLabels: JSON.parse(req.body.dietlabels),
+        healthLabels: JSON.parse(req.body.healthlabels),
+        ingredients: JSON.parse(req.body.ingredients),
+        makingDescription: req.body.makingDescription,
+        cuisineType: JSON.parse(req.body.cuisineType),
+        mealType: JSON.parse(req.body.mealType)
+      },
+      { new: true }
+    )
+
+    // const gen = await Genres.updateOne({ _id: req.params.id }, { name: req.body.name });
+
+    res.send(recipe)
+  } catch (ex) {
+    res.status(404).send('data not found')
   }
 })
 router.delete('/:id', async (req, res) => {

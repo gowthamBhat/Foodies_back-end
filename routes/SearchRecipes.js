@@ -5,8 +5,6 @@ const router = express.Router()
 //route to search recipes
 router.get('/:label', async (req, res) => {
   try {
-    console.log(req.params.userid)
-
     const dishes = await Recipe.find({ label: req.params.label }).sort('label')
 
     res.send(dishes)
