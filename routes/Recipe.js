@@ -66,7 +66,7 @@ router.get('/byId/:id', async (req, res) => {
   try {
     console.log(req.params.id)
 
-    const dishes = await Recipe.find({ _id: req.params.id }).sort('label')
+    const dishes = await Recipe.find({ _id: req.params.id })
 
     res.send(dishes)
   } catch (err) {

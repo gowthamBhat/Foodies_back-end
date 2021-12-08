@@ -12,6 +12,7 @@ const userSignUpRoute = require('./routes/User')
 const recipeRoutes = require('./routes/Recipe')
 const userLogInRoute = require('./routes/Auth')
 const recipeSearchRoute = require('./routes/SearchRecipes')
+const wishListRoute = require('./routes/WishList')
 
 process.on('uncaughtException', (e) => {
   console.log('WE GOT AN UNCAUGHT EXCEPTION')
@@ -46,6 +47,7 @@ app.use('/signup', userSignUpRoute)
 app.use('/recipe', recipeRoutes)
 app.use('/login', userLogInRoute)
 app.use('/search', recipeSearchRoute)
+app.use('/wishlist', wishListRoute)
 
 //TODO: need to separate this Database  module
 
