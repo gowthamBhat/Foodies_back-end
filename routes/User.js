@@ -21,8 +21,12 @@ const router = express.Router()
 //   })
 // )
 router.get('/', async (req, res) => {
-  let users = await User.find().sort('name')
-  res.status(200).send(users)
+  try {
+    let users = await User.find().sort('name')
+    res.status(200).send(users)
+  } catch (error) {
+    console.log(error)
+  }
 })
 router.post('/', async (req, res) => {
   try {
@@ -64,6 +68,15 @@ router.post('/', async (req, res) => {
     console.log(err)
 
     res.status(400).send('something went wrong')
+  }
+})
+
+router.delete('/:id', async (req, res) => {
+  try {
+    let user = await User.findByIdAndDelete(req.params.id)
+    res.send(user)
+  } catch (error) {
+    console.log('error occured while deleting a user', error)
   }
 })
 

@@ -50,8 +50,6 @@ router.get('/', async (req, res) => {
 //for userdashboard specific author recipe display
 router.get('/:userid', async (req, res) => {
   try {
-    console.log(req.params.userid)
-
     const dishes = await Recipe.find({ authorId: req.params.userid }).sort(
       'label'
     )
@@ -93,7 +91,8 @@ router.post('/', upload.single('recipeImage'), async (req, res) => {
       ingredients: JSON.parse(req.body.ingredients),
       makingDescription: req.body.makingDescription,
       cuisineType: JSON.parse(req.body.cuisineType),
-      mealType: JSON.parse(req.body.mealType)
+      mealType: JSON.parse(req.body.mealType),
+      likes: []
     })
 
     recipe = await recipe.save()
@@ -155,4 +154,40 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+router.put('/api/like', async (req, res) => {
+  try {
+    //user id and post id is needed
+    //have to get it from req body
+    let likedPost = await Recipe.findByIdAndUpdate(
+      req.body.recipeId,
+      {
+        $push: { likes: req.body.userId }
+      },
+      {
+        new: true
+      }
+    )
+    res.json(likedPost)
+  } catch (error) {
+    console.log('error while liking the post', error)
+  }
+})
+router.put('/api/unlike', async (req, res) => {
+  try {
+    //user id and post id is needed
+    //have to get it from req body
+    let disLikedPost = await Recipe.findByIdAndUpdate(
+      req.body.recipeId,
+      {
+        $pull: { likes: req.body.userId }
+      },
+      {
+        new: true
+      }
+    )
+    res.json(disLikedPost)
+  } catch (error) {
+    console.log('error while liking the post', error)
+  }
+})
 module.exports = router

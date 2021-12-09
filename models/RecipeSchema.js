@@ -28,7 +28,8 @@ const recipeSchema = new mongoose.Schema(
       type: String
     },
     cuisineType: [String],
-    mealType: [String]
+    mealType: [String],
+    likes: []
   },
   { timestamps: true }
 )
