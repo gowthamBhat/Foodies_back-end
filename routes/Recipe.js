@@ -5,6 +5,7 @@ const multer = require('multer')
 //*importing User class and Joi validate method from userValidate.js file
 
 const Recipe = require('../models/RecipeSchema')
+const WishList = require('../models/WishListSchema')
 
 const router = express.Router()
 
@@ -135,9 +136,20 @@ router.put('/:id', upload.single('recipeImage'), async (req, res) => {
 })
 router.delete('/:id', async (req, res) => {
   try {
-    const gen = await Recipe.findByIdAndRemove(req.params.id)
-
-    res.send(gen)
+    //checking if the recipe in wishlist collection
+    const isExistInWIshList = await WishList.exists({
+      recipe_id: req.params.id
+    })
+    //if exist deleting it
+    if (isExistInWIshList) {
+      const existsInWishList = await WishList.deleteMany({
+        recipe_id: req.params.id
+      })
+      console.log('deleted from wishlist', existsInWishList)
+    }
+    //deleting from recipe collection
+    const deletedRecipe = await Recipe.findByIdAndRemove(req.params.id)
+    res.send(deletedRecipe)
   } catch (error) {
     res.status(404).send('data not found')
   }

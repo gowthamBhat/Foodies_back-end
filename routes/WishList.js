@@ -5,13 +5,17 @@ const WishList = require('../models/WishListSchema')
 const Recipe = require('../models/RecipeSchema')
 router.get('/:userId', async (req, res) => {
   try {
-    console.log(req.params.userId)
+    let out = []
 
-    const dishes = await WishList.find({ userId: req.params.userId }).sort(
-      'label'
-    )
+    const dishes = await WishList.find(
+      { userId: req.params.userId },
+      { recipe: 1 }
+    ).sort('label')
 
-    res.send(dishes)
+    dishes.map((x) => out.push(x.recipe)) //removing _id proerty and user_id property
+    //so the data fromat can fit to display component
+
+    res.send(out)
   } catch (err) {
     console.log(err)
     res.status(404).send('data not found')
@@ -20,13 +24,24 @@ router.get('/:userId', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
+    //checking if the recipe already exits in WishList Collection
+    let isRecipeExists = await WishList.findOne({
+      recipe_id: req.body.recipeId,
+      userId: req.body.userId
+    })
+
+    if (isRecipeExists) {
+      res.status(403).send('record already exists')
+      return
+    }
+
     const getRecipe = await Recipe.findById(req.body.recipeId)
-    console.log('req body of wish list', req.body)
+    // console.log('req body of wish list', req.body)
 
     let wish = new WishList({
+      recipe_id: getRecipe._id,
       userId: req.body.userId,
       recipe: {
-        _id: getRecipe._id,
         authorId: getRecipe.authorId,
         authorUsername: getRecipe.authorUsername,
         label: getRecipe.label,
