@@ -34,5 +34,12 @@ router.post('/', async (req, res) => {
     res.status(400).send('something went wrong while saving the file')
   }
 })
-
+router.delete('/:id', async (req, res) => {
+  try {
+    let user = await FeedBack.findByIdAndDelete(req.params.id)
+    res.send(user)
+  } catch (error) {
+    console.log('error occured while deleting a user', error)
+  }
+})
 module.exports = router

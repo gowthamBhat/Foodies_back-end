@@ -29,7 +29,7 @@ const wishListSchema = new mongoose.Schema({
       makingDescription: {
         type: String
       },
-      cuisineType: [],
+      cuisineType: String,
       mealType: []
     }),
     required: true

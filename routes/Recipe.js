@@ -8,6 +8,7 @@ const Recipe = require('../models/RecipeSchema')
 const WishList = require('../models/WishListSchema')
 
 const router = express.Router()
+// var fs = require('fs')
 
 const stroage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -41,18 +42,42 @@ const upload = multer({
 
 router.get('/', async (req, res) => {
   try {
-    let recipes = await Recipe.find().sort('label')
+    let recipes = await Recipe.find().sort({
+      createdAt: -1
+    })
     res.send(recipes)
   } catch (error) {
     res.status(400).send('something went wrong while retriving data data')
   }
 })
+//*category nav bar
+router.get('/category', async (req, res) => {
+  try {
+    let recipes = await Recipe.find({}, { cuisineType: 1 }).sort({
+      createdAt: -1
+    })
+    res.send(recipes)
+  } catch (error) {
+    res.status(400).send('something went wrong while retriving data data')
+  }
+})
+router.get('/category/:cuisine', async (req, res) => {
+  try {
+    let recipes = await Recipe.find({ cuisineType: req.params.cuisine }).sort({
+      createdAt: -1
+    })
+    res.send(recipes)
+  } catch (error) {
+    res.status(400).send('something went wrong while retriving data data')
+  }
+})
+
 //for userdashboard specific author recipe display
 router.get('/:userid', async (req, res) => {
   try {
-    const dishes = await Recipe.find({ authorId: req.params.userid }).sort(
-      'label'
-    )
+    const dishes = await Recipe.find({ authorId: req.params.userid }).sort({
+      createdAt: -1
+    })
 
     res.send(dishes)
   } catch (err) {
@@ -61,6 +86,23 @@ router.get('/:userid', async (req, res) => {
     res.status(404).send('data not found')
   }
 })
+router.get('/perkcoins/:userid', async (req, res) => {
+  try {
+    const dishes = await Recipe.find({ authorId: req.params.userid }, {}).sort({
+      createdAt: -1
+    })
+    var count = 0
+    if (dishes.length > 0)
+      for (let i = 0; i < dishes.length; i++) count += dishes[i].likes.length
+
+    res.send({ total_likes: count })
+  } catch (err) {
+    console.log(err)
+
+    res.status(404).send('data not found')
+  }
+})
+
 router.get('/byId/:id', async (req, res) => {
   try {
     console.log(req.params.id)
@@ -72,6 +114,21 @@ router.get('/byId/:id', async (req, res) => {
     console.log(err)
 
     res.status(404).send('data not found')
+  }
+})
+
+//get reported posts
+
+router.get('/reported/allposts', async (req, res) => {
+  console.log('enterd')
+
+  try {
+    let recipes = await Recipe.find({ isReported: true }).sort({
+      createdAt: -1
+    })
+    res.send(recipes)
+  } catch (error) {
+    res.status(400).send('something went wrong while retriving data data')
   }
 })
 
@@ -90,7 +147,7 @@ router.post('/', upload.single('recipeImage'), async (req, res) => {
       healthLabels: JSON.parse(req.body.healthlabels),
       ingredients: JSON.parse(req.body.ingredients),
       makingDescription: req.body.makingDescription,
-      cuisineType: JSON.parse(req.body.cuisineType),
+      cuisineType: req.body.cuisineType,
       mealType: JSON.parse(req.body.mealType),
       likes: []
     })
@@ -120,7 +177,7 @@ router.put('/:id', upload.single('recipeImage'), async (req, res) => {
         healthLabels: JSON.parse(req.body.healthlabels),
         ingredients: JSON.parse(req.body.ingredients),
         makingDescription: req.body.makingDescription,
-        cuisineType: JSON.parse(req.body.cuisineType),
+        cuisineType: req.body.cuisineType,
         mealType: JSON.parse(req.body.mealType)
       },
       { new: true }
@@ -133,6 +190,41 @@ router.put('/:id', upload.single('recipeImage'), async (req, res) => {
     res.status(404).send('data not found')
   }
 })
+router.put('/report/:id', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByIdAndUpdate(
+      req.body.id,
+      {
+        isReported: true
+      },
+      { new: true }
+    )
+
+    // const gen = await Genres.updateOne({ _id: req.params.id }, { name: req.body.name });
+
+    res.send(recipe)
+  } catch (ex) {
+    res.status(404).send('data not found')
+  }
+})
+router.put('/ignorereport/:id', async (req, res) => {
+  try {
+    const recipe = await Recipe.findByIdAndUpdate(
+      req.body.id,
+      {
+        isReported: false
+      },
+      { new: true }
+    )
+
+    // const gen = await Genres.updateOne({ _id: req.params.id }, { name: req.body.name });
+
+    res.send(recipe)
+  } catch (ex) {
+    res.status(404).send('data not found')
+  }
+})
+
 router.delete('/:id', async (req, res) => {
   try {
     //checking if the recipe in wishlist collection
@@ -148,8 +240,17 @@ router.delete('/:id', async (req, res) => {
     }
     //deleting from recipe collection
     const deletedRecipe = await Recipe.findByIdAndRemove(req.params.id)
+    console.log('deleted recipe', deletedRecipe)
+    //     var filePathme =
+    //       'D:Projects\foodeis full app\foodies_backend ' + deletedRecipe.url
+    //     console.log('path', filePathme)
+
+    //  fs.unlinkSync(filePathme)
+
     res.send(deletedRecipe)
   } catch (error) {
+    console.log(error)
+
     res.status(404).send('data not found')
   }
 })
